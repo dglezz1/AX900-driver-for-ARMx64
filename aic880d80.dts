@@ -1,0 +1,267 @@
+# Device Tree Binding for AIC semi AIC 880d80 Network Controller
+# ARM64 Architecture Support
+
+# aic880d80.dts - Device Tree Source for ARM64 platforms
+/dts-v1/;
+
+/ {
+    model = "AIC semi AIC 880d80 Network Controller";
+    compatible = "aic,880d80", "pci-device";
+
+    #address-cells = <2>;
+    #size-cells = <2>;
+
+    aliases {
+        ethernet0 = &aic880d80;
+    };
+
+    memory@40000000 {
+        device_type = "memory";
+        reg = <0x0 0x40000000 0x0 0x80000000>; /* 2GB RAM */
+    };
+
+    chosen {
+        stdout-path = "serial0:115200n8";
+    };
+
+    cpus {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        cpu@0 {
+            device_type = "cpu";
+            compatible = "arm,cortex-a72";
+            reg = <0x0>;
+            enable-method = "psci";
+            next-level-cache = <&l2_cache>;
+        };
+
+        cpu@1 {
+            device_type = "cpu";
+            compatible = "arm,cortex-a72";
+            reg = <0x1>;
+            enable-method = "psci";
+            next-level-cache = <&l2_cache>;
+        };
+
+        cpu@2 {
+            device_type = "cpu";
+            compatible = "arm,cortex-a72";
+            reg = <0x2>;
+            enable-method = "psci";
+            next-level-cache = <&l2_cache>;
+        };
+
+        cpu@3 {
+            device_type = "cpu";
+            compatible = "arm,cortex-a72";
+            reg = <0x3>;
+            enable-method = "psci";
+            next-level-cache = <&l2_cache>;
+        };
+
+        l2_cache: l2-cache {
+            compatible = "cache";
+            cache-level = <2>;
+            cache-unified;
+        };
+    };
+
+    psci {
+        compatible = "arm,psci-1.0";
+        method = "smc";
+    };
+
+    timer {
+        compatible = "arm,armv8-timer";
+        interrupts = <1 13 0x308>,
+                     <1 14 0x308>,
+                     <1 11 0x308>,
+                     <1 10 0x308>;
+    };
+
+    pmu {
+        compatible = "arm,cortex-a72-pmu";
+        interrupts = <0 7 4>,
+                     <0 8 4>,
+                     <0 9 4>,
+                     <0 10 4>;
+        interrupt-affinity = <&cpu0>, <&cpu1>, <&cpu2>, <&cpu3>;
+    };
+
+    soc {
+        compatible = "simple-bus";
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+
+        /* PCIe controller for AIC 880d80 */
+        pcie: pcie@3f000000 {
+            compatible = "brcm,bcm2711-pcie";
+            reg = <0x0 0x3f000000 0x0 0x9000>;
+            device_type = "pci";
+            #address-cells = <3>;
+            #size-cells = <2>;
+            #interrupt-cells = <1>;
+            interrupts = <0 148 4>, <0 149 4>;
+            interrupt-names = "pcie", "msi";
+            
+            ranges = <0x02000000 0x0 0x40000000 0x0 0x40000000 0x0 0x40000000>;
+            
+            msi-controller;
+            msi-parent = <&pcie>;
+            
+            /* AIC 880d80 specific properties */
+            aic880d80: ethernet@0 {
+                compatible = "aic,880d80-pci";
+                reg = <0x0000 0 0 0 0>;
+                device_type = "network";
+                
+                /* ARM64 specific optimizations */
+                dma-coherent;
+                iommu-map = <0x0 &smmu 0x0 0x1>;
+                
+                /* Network properties */
+                max-speed = <10000>; /* 10 Gbps */
+                phy-mode = "rgmii-rxid";
+                
+                /* Power management */
+                power-domains = <&power RPI_POWER_DOMAIN_USB>;
+                
+                /* DMA configuration for ARM64 */
+                dma-ranges = <0x0 0x00000000 0x0 0x00000000 0x1 0x00000000>;
+                
+                /* Cache configuration */
+                cache-line-size = <64>;
+                
+                /* Interrupt configuration */
+                interrupts-extended = <&gic GIC_SPI 189 IRQ_TYPE_LEVEL_HIGH>;
+                interrupt-names = "aic880d80";
+                
+                /* GPIO configuration (if needed) */
+                reset-gpios = <&gpio 26 GPIO_ACTIVE_LOW>;
+                
+                /* Clock configuration */
+                clocks = <&clk_usb>;
+                clock-names = "aic880d80";
+                
+                /* Vendor specific properties */
+                aic,vendor-id = <0x1AE0>;
+                aic,device-id = <0x880D>;
+                aic,subsystem-id = <0x0001>;
+                aic,revision-id = <0x01>;
+                
+                /* ARM64 optimization flags */
+                aic,arm64-optimized;
+                aic,cache-coherent;
+                aic,neon-acceleration;
+                aic,prefetch-enabled;
+                
+                /* Buffer configuration */
+                aic,rx-ring-size = <256>;
+                aic,tx-ring-size = <256>;
+                aic,rx-buffer-size = <2048>;
+                aic,tx-buffer-size = <2048>;
+                
+                /* Performance tuning */
+                aic,burst-length = <16>;
+                aic,dma-coherency = <1>;
+                aic,interrupt-coalescing = <1>;
+                
+                /* Security features */
+                aic,secure-boot;
+                aic,encrypted-firmware;
+                
+                status = "okay";
+            };
+        };
+
+        gic: interrupt-controller@40000000 {
+            compatible = "arm,gic-v2";
+            #interrupt-cells = <3>;
+            interrupt-controller;
+            reg = <0x0 0x40001000 0x0 0x1000>,
+                  <0x0 0x40002000 0x0 0x2000>;
+        };
+
+        smmu: smmu@40000000 {
+            compatible = "arm,smmu-v3";
+            reg = <0x0 0x40000000 0x0 0x100000>;
+            #iommu-cells = <1>;
+            interrupts = <0 74 4>,
+                         <0 75 4>,
+                         <0 76 4>,
+                         <0 77 4>;
+            interrupt-names = "eventq", "priq", "cmdq-sync", "gerror";
+        };
+
+        gpio: gpio@7e200000 {
+            compatible = "brcm,bcm2711-gpio";
+            reg = <0x0 0x7e200000 0x0 0xb4>;
+            interrupts = <0 113 4>, <0 114 4>, <0 115 4>, <0 116 4>;
+            
+            gpio-controller;
+            #gpio-cells = <2>;
+            
+            interrupt-controller;
+            #interrupt-cells = <2>;
+        };
+
+        clk_usb: clock@7e104000 {
+            compatible = "brcm,bcm2711-clock";
+            reg = <0x0 0x7e104000 0x0 0x100>;
+            #clock-cells = <0>;
+            clock-frequency = <480000000>;
+        };
+
+        power: power {
+            compatible = "raspberrypi,bcm2835-power";
+            #power-domain-cells = <1>;
+        };
+    };
+
+    __overrides__ {
+        aic880d80_enable = <&aic880d80>,"status";
+        aic880d80_speed = <&aic880d80>,"max-speed:0";
+        aic880d80_arm64_opt = <&aic880d80>,"aic,arm64-optimized?";
+        aic880d80_cache_coherent = <&aic880d80>,"aic,cache-coherent?";
+        aic880d80_rx_ring_size = <&aic880d80>,"aic,rx-ring-size:0";
+        aic880d80_tx_ring_size = <&aic880d80>,"aic,tx-ring-size:0";
+    };
+};
+
+/*
+ * Fragment overlay for dynamic loading
+ */
+/plugin/;
+
+/ {
+    fragment@0 {
+        target = <&pcie>;
+        __overlay__ {
+            #address-cells = <3>;
+            #size-cells = <2>;
+            
+            aic880d80_overlay: aic880d80@0,0 {
+                compatible = "aic,880d80-pci";
+                reg = <0x0000 0 0 0 0>;
+                
+                /* Runtime configurable properties */
+                aic,runtime-config;
+                aic,dynamic-power-management;
+                aic,adaptive-interrupt-coalescing;
+                
+                /* ARM64 specific runtime optimizations */
+                aic,runtime-arm64-tuning;
+                aic,dynamic-cache-policy;
+                aic,adaptive-prefetch;
+                
+                status = "disabled"; /* Enable via overlay parameter */
+            };
+        };
+    };
+    
+    __overrides__ {
+        aic880d80_overlay_enable = <&aic880d80_overlay>,"status";
+    };
+};
