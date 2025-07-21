@@ -1,4 +1,10 @@
-// Elimina stubs duplicados, los prototipos y definiciones completas van más adelante
+// Stubs mínimos para evitar errores de linker
+static int aic880d80_probe(struct pci_dev *pdev, const struct pci_device_id *id) { return -ENODEV; }
+static void aic880d80_remove(struct pci_dev *pdev) { }
+static int aic880d80_suspend(struct device *dev) { return 0; }
+static int aic880d80_resume(struct device *dev) { return 0; }
+static irqreturn_t aic880d80_interrupt(int irq, void *data) { return IRQ_NONE; }
+static int aic880d80_poll(struct napi_struct *napi, int budget) { return 0; }
 /*
  * AIC semi AIC 880d80 Network Driver - Main Implementation
  * 
