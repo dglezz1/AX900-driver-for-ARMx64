@@ -1,10 +1,4 @@
-// Stubs mínimos para evitar warnings de funciones no definidas
-static int aic880d80_probe(struct pci_dev *pdev, const struct pci_device_id *id) { return -ENODEV; }
-static void aic880d80_remove(struct pci_dev *pdev) { }
-static int aic880d80_suspend(struct device *dev) { return 0; }
-static int aic880d80_resume(struct device *dev) { return 0; }
-static irqreturn_t aic880d80_interrupt(int irq, void *data) { return IRQ_NONE; }
-static int aic880d80_poll(struct napi_struct *napi, int budget) { return 0; }
+// Elimina stubs duplicados, los prototipos y definiciones completas van más adelante
 /*
  * AIC semi AIC 880d80 Network Driver - Main Implementation
  * 
@@ -19,17 +13,18 @@ static int aic880d80_poll(struct napi_struct *napi, int budget) { return 0; }
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
-#include <linux/pci.h>
-#include <linux/netdevice.h>
+#include <linux/pci.h>           // struct pci_dev, struct pci_device_id
+#include <linux/netdevice.h>     // struct napi_struct, netdev ops
 #include <linux/etherdevice.h>
 #include <linux/skbuff.h>
-#include <linux/interrupt.h>
+#include <linux/interrupt.h>     // irqreturn_t, IRQ_NONE
 #include <linux/dma-mapping.h>
 #include <linux/delay.h>
 #include <linux/iopoll.h>
 #include <linux/pm_runtime.h>
 #include <linux/prefetch.h>
 #include <linux/cpu_rmap.h>
+#include <linux/errno.h>         // ENODEV, ENOMEM, ETIMEDOUT
 #include <net/ip.h>
 #include <net/tcp.h>
 
