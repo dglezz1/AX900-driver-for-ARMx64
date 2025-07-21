@@ -198,6 +198,20 @@ struct aic880d80_stats {
 #define AIC880D80_ERR_INVALID_PARAM -4
 #define AIC880D80_ERR_HW_FAILURE    -5
 
+/* Inline accessors for register read/write */
+static inline u32 aic880d80_read32(struct aic880d80_private *priv, u32 reg)
+{
+    return readl(priv->iobase + reg);
+}
+static inline void aic880d80_write32(struct aic880d80_private *priv, u32 reg, u32 val)
+{
+    writel(val, priv->iobase + reg);
+}
+
+/* MAC register aliases for compatibility */
+#define AIC880D80_REG_MAC_LO   AIC880D80_REG_MAC_ADDR_LO
+#define AIC880D80_REG_MAC_HI   AIC880D80_REG_MAC_ADDR_HI
+
 /* Helper Macros */
 #define AIC880D80_GET_SPEED(status) \
     (((status) & AIC880D80_STATUS_SPEED_MASK) >> 2)
