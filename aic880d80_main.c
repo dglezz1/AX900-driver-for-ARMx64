@@ -28,7 +28,16 @@
 #include <net/ip.h>
 #include <net/tcp.h>
 
+
 #include "aic880d80.h"
+
+// Stubs mínimos para evitar errores de linker
+static int aic880d80_probe(struct pci_dev *pdev, const struct pci_device_id *id) { return -ENODEV; }
+static void aic880d80_remove(struct pci_dev *pdev) { }
+static int aic880d80_suspend(struct device *dev) { return 0; }
+static int aic880d80_resume(struct device *dev) { return 0; }
+static irqreturn_t aic880d80_interrupt(int irq, void *data) { return IRQ_NONE; }
+static int aic880d80_poll(struct napi_struct *napi, int budget) { return 0; }
 
 #define DRV_NAME "aic880d80"
 #define DRV_VERSION "1.0.0"
