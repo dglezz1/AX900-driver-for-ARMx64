@@ -34,7 +34,7 @@ EXTRA_CFLAGS += -Wstrict-prototypes
 EXTRA_CFLAGS += -Wno-trigraphs
 EXTRA_CFLAGS += -Werror-implicit-function-declaration
 EXTRA_CFLAGS += -Wno-format-security
-EXTRA_CFLAGS += -std=gnu89
+EXTRA_CFLAGS += -std=gnu99
 
 # ARM64 cache optimizations
 EXTRA_CFLAGS += -DAIC880D80_CACHE_LINE_SIZE=64
@@ -47,7 +47,7 @@ EXTRA_CFLAGS += -DAIC880D80_USE_NEON_OPTIMIZATION
 # Kali Linux specific paths
 KALI_KERNEL_HEADERS := /usr/src/linux-headers-$(KERNEL_VERSION)
 ifeq ($(wildcard $(KALI_KERNEL_HEADERS)),)
-    KERNEL_DIR := /usr/src/linux-headers-$(KERNEL_VERSION)-common
+	KERNEL_DIR := /usr/src/linux-headers-$(KERNEL_VERSION)-common
 endif
 
 # Default target
