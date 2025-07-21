@@ -1,20 +1,3 @@
-// Stubs mínimos para evitar errores de linker
-static int aic880d80_probe(struct pci_dev *pdev, const struct pci_device_id *id) { return -ENODEV; }
-static void aic880d80_remove(struct pci_dev *pdev) { }
-static int aic880d80_suspend(struct device *dev) { return 0; }
-static int aic880d80_resume(struct device *dev) { return 0; }
-static irqreturn_t aic880d80_interrupt(int irq, void *data) { return IRQ_NONE; }
-static int aic880d80_poll(struct napi_struct *napi, int budget) { return 0; }
-/*
- * AIC semi AIC 880d80 Network Driver - Main Implementation
- * 
- * Copyright (C) 2025 Zero Day Security Research
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- */
 
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -33,8 +16,6 @@ static int aic880d80_poll(struct napi_struct *napi, int budget) { return 0; }
 #include <linux/errno.h>         // ENODEV, ENOMEM, ETIMEDOUT
 #include <net/ip.h>
 #include <net/tcp.h>
-
-
 #include "aic880d80.h"
 
 // Stubs mínimos para evitar errores de linker
@@ -44,6 +25,16 @@ static int aic880d80_suspend(struct device *dev) { return 0; }
 static int aic880d80_resume(struct device *dev) { return 0; }
 static irqreturn_t aic880d80_interrupt(int irq, void *data) { return IRQ_NONE; }
 static int aic880d80_poll(struct napi_struct *napi, int budget) { return 0; }
+/*
+ * AIC semi AIC 880d80 Network Driver - Main Implementation
+ * 
+ * Copyright (C) 2025 Zero Day Security Research
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
 
 #define DRV_NAME "aic880d80"
 #define DRV_VERSION "1.0.0"
@@ -115,13 +106,6 @@ struct aic880d80_private {
     u32 msg_enable;
 };
 
-/* Forward declarations */
-static int aic880d80_probe(struct pci_dev *pdev, const struct pci_device_id *id);
-static void aic880d80_remove(struct pci_dev *pdev);
-static int aic880d80_suspend(struct device *dev);
-static int aic880d80_resume(struct device *dev);
-static irqreturn_t aic880d80_interrupt(int irq, void *data);
-static int aic880d80_poll(struct napi_struct *napi, int budget);
 
 /* PCI device table */
 static const struct pci_device_id aic880d80_pci_tbl[] = {
